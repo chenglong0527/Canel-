@@ -1,0 +1,47 @@
+#数据源
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cskaoyanmall?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 123456
+
+#端口
+server:
+  port: 8081
+
+#日志
+logging:
+  level:
+    com:
+      cskaoyan:
+        spring_mall:
+          mapper: debug
+
+#分页
+pagehelper:
+  auto-dialect: mysql
+
+#cos腾讯云
+qcloud:
+  #初始化用户身份信息 前往控制台密钥管理查看
+  secretId: AKIDjETyLcePxGJ6dvsJAkALGxREl7FKBl7D
+  secretKey: A7olsj7IDUWIsCJAm9UZO1RcWJrJVBgv
+  # 指定要上传到的存储桶
+  bucketName: bugfu-1253695790
+  # 地区选择
+  regionName: ap-chengdu
+#alyun sms
+mall:
+  aliyun:
+    sign-name: mallsms
+    template-code: SMS_177538831
+    region-id: cn-hangzhou
+    access-id: LTAI4FpJzHLdi3PePG7HMCaG
+    access-secret: 8Yn7Tcwoki0QeEpa2f7cDedJJrALB5
+
+
+#配置handler
+mybatis:
+  type-handlers-package: com.cskaoyan.spring_mall.handler
