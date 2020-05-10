@@ -50,14 +50,8 @@ public class CanalClient {
                         Thread.sleep(1000);
                     } else {
                         dataHandle(message.getEntries());
-//                        CanelApplicationTests.printEntry(message.getEntries());
                     }
                     connector.ack(batchId);
-
-                    //当队列里面堆积的sql大于一定数值的时候就模拟执行
-                    if (SQL_QUEUE.size() >= 10) {
-                        executeQueueSql();
-                    }
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -114,11 +108,17 @@ public class CanalClient {
             for (RowData rowData : rowDatasList) {
                 List<Column> newColumnList = rowData.getAfterColumnsList();
                 StringBuffer sql = new StringBuffer("update " + entry.getHeader().getSchemaName() + "." + entry.getHeader().getTableName() + " set ");
+                String orderId="";
                 for (int i = 0; i < newColumnList.size(); i++) {
                     sql.append(" " + newColumnList.get(i).getName()
                             + " = '" + newColumnList.get(i).getValue() + "'");
                     if (i != newColumnList.size() - 1) {
                         sql.append(",");
+                    }
+
+                    //获取OrderId
+                    if("orderId".equals(newColumnList.get(i).getName())){
+                        orderId=newColumnList.get(i).getValue();
                     }
                 }
                 sql.append(" where ");
@@ -131,7 +131,7 @@ public class CanalClient {
                     }
                 }
                 System.out.println("模拟执行："+sql.toString());
-                RocketMQProducer.sendSQL(sql.toString());
+                RocketMQProducer.sendSQL(sql.toString(),orderId);
                 SQL_QUEUE.add(sql.toString());
             }
         } catch (InvalidProtocolBufferException e) {
@@ -159,7 +159,7 @@ public class CanalClient {
                     }
                 }
                 System.out.println("模拟执行："+sql.toString());
-                RocketMQProducer.sendSQL(sql.toString());
+                RocketMQProducer.sendSQL(sql.toString(),"");
                 SQL_QUEUE.add(sql.toString());
             }
         } catch (InvalidProtocolBufferException e) {
@@ -179,22 +179,31 @@ public class CanalClient {
             for (RowData rowData : rowDatasList) {
                 List<Column> columnList = rowData.getAfterColumnsList();
                 StringBuffer sql = new StringBuffer("insert into " + entry.getHeader().getSchemaName() + "." + entry.getHeader().getTableName() + " (");
+                Integer orderIdStringIndex=null;
                 for (int i = 0; i < columnList.size(); i++) {
                     sql.append(columnList.get(i).getName());
                     if (i != columnList.size() - 1) {
                         sql.append(",");
                     }
+                    if("orderId".equals(columnList.get(i).getName())){
+                        orderIdStringIndex=i;
+                    }
                 }
                 sql.append(") VALUES (");
+
+                String orderId="";
                 for (int i = 0; i < columnList.size(); i++) {
                     sql.append("'" + columnList.get(i).getValue() + "'");
                     if (i != columnList.size() - 1) {
                         sql.append(",");
                     }
+                    if(orderIdStringIndex==i){
+                        orderId=columnList.get(i).getValue();
+                    }
                 }
                 sql.append(")");
                 System.out.println("模拟执行："+sql.toString());
-                RocketMQProducer.sendSQL(sql.toString());
+                RocketMQProducer.sendSQL(sql.toString(),orderId);
                 SQL_QUEUE.add(sql.toString());
             }
         } catch (InvalidProtocolBufferException e) {
