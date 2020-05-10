@@ -21,9 +21,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class CanalClient {
 
 
-    public static String CANAL_ADDRESS="192.168.124.25";
+    public static String CANAL_ADDRESS="192.168.124.25";//Canel所在的机器的IP
 
-    public static int PORT=11111;
+    public static int PORT=11111;//Canel的端口
 
     public static String DESTINATION="example";
 
@@ -42,16 +42,16 @@ public class CanalClient {
             try {
                 while (true) {
                     //尝试从master那边拉去数据batchSize条记录，有多少取多少
-                    Message message = connector.getWithoutAck(batchSize);
+                    Message message = connector.getWithoutAck(batchSize);//从Canel中拉取一批数据进行处理
 //                    System.out.println(message);
                     long batchId = message.getId();
                     int size = message.getEntries().size();
                     if (batchId == -1 || size == 0) {
                         Thread.sleep(1000);
                     } else {
-                        dataHandle(message.getEntries());
+                        dataHandle(message.getEntries());//对Canel中渠道信息进行处理
                     }
-                    connector.ack(batchId);
+                    connector.ack(batchId);//处理完之后将batchId返回给Canel，进行标记
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -85,11 +85,11 @@ public class CanalClient {
             if (EntryType.ROWDATA == entry.getEntryType()) {
                 RowChange rowChange = RowChange.parseFrom(entry.getStoreValue());
                 EventType eventType = rowChange.getEventType();
-                if (eventType == EventType.DELETE) {
+                if (eventType == EventType.DELETE) {//删除
                     saveDeleteSql(entry);
-                } else if (eventType == EventType.UPDATE) {
+                } else if (eventType == EventType.UPDATE) {//更新
                     saveUpdateSql(entry);
-                } else if (eventType == EventType.INSERT) {
+                } else if (eventType == EventType.INSERT) {//插入
                     saveInsertSql(entry);
                 }
             }
