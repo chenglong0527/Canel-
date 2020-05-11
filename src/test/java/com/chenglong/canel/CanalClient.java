@@ -131,7 +131,8 @@ public class CanalClient {
                     }
                 }
                 System.out.println("模拟执行："+sql.toString());
-                RocketMQProducer.sendSQL(sql.toString(),orderId);
+                RocketMQProducer.sendSQL(sql.toString(),orderId,entry.getHeader().getTableName());
+                RocketMQProducer.sendDelayMessage(orderId,entry.getHeader().getTableName());
                 SQL_QUEUE.add(sql.toString());
             }
         } catch (InvalidProtocolBufferException e) {
@@ -159,7 +160,8 @@ public class CanalClient {
                     }
                 }
                 System.out.println("模拟执行："+sql.toString());
-                RocketMQProducer.sendSQL(sql.toString(),"");
+                RocketMQProducer.sendSQL(sql.toString(),"",entry.getHeader().getTableName());
+//                RocketMQProducer.sendDelayMessage(orderId,entry.getHeader().getTableName());
                 SQL_QUEUE.add(sql.toString());
             }
         } catch (InvalidProtocolBufferException e) {
@@ -203,7 +205,8 @@ public class CanalClient {
                 }
                 sql.append(")");
                 System.out.println("模拟执行："+sql.toString());
-                RocketMQProducer.sendSQL(sql.toString(),orderId);
+                RocketMQProducer.sendSQL(sql.toString(),orderId,entry.getHeader().getTableName());
+                RocketMQProducer.sendDelayMessage(orderId,entry.getHeader().getTableName());
                 SQL_QUEUE.add(sql.toString());
             }
         } catch (InvalidProtocolBufferException e) {

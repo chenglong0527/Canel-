@@ -16,7 +16,7 @@ public class RocketMQConsumer {
 
         final DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("test_consumer1");
         consumer.setNamesrvAddr("127.0.0.1:9876");
-        consumer.subscribe("example", "*");
+        consumer.subscribe("example", "user");
         consumer.registerMessageListener(new MessageListenerOrderly() {
                                              @Override
                                              public ConsumeOrderlyStatus consumeMessage(List<MessageExt> list, ConsumeOrderlyContext context) {
